@@ -10,9 +10,9 @@ import java.util.function.Predicate;
 public class Application {
 
     public static void main(String[] args) {
-        final CheckerArgs cpcca = new CheckerArgs(args);
+        final CheckerArgs checkerArgs = new CheckerArgs(args);
 
-        if (cpcca.isNotValid()) cpcca.throwException();
+        if (checkerArgs.isNotValid()) checkerArgs.throwException();
 
         final ParserArgs parserArgs = new ParserArgs(args);
 
@@ -24,17 +24,15 @@ public class Application {
 
         initerFileSystem.init();
 
-        final MoverFile moverFile = new MoverFile();
-
-        final WalkerFileSystem walkerFileSystem = new WalkerFileSystem(fileCopyConfig);
-
-        final FileNameBuilder creationTimeNameBuilder = new CreatinTimeNameBuilder();
-
-        final Predicate<Path> containsExtebsions = (path) -> {
+        final Predicate<Path> containsExtensions = (path) -> {
             final String nameFile = path.toAbsolutePath().toString();
             final String extensionFile = FilenameUtils.getExtension(nameFile);
             return fileCopyConfig.getExts().contains(extensionFile.toLowerCase());
         };
+
+        final FileNameBuilder creationTimeNameBuilder = new CreatinTimeNameBuilder();
+
+        final MoverFile moverFile = new MoverFile();
 
         final Consumer<File> moveFileConsumer = file -> {
             final String creationTimeName = creationTimeNameBuilder.buildName(file.toPath());
@@ -43,7 +41,8 @@ public class Application {
             moverFile.move(file, destinationFolder);
         };
 
-        walkerFileSystem.getTargetFiles(containsExtebsions).forEach(moveFileConsumer);
+        final WalkerFileSystem walkerFileSystem = new WalkerFileSystem(fileCopyConfig);
+        walkerFileSystem.getTargetFiles(containsExtensions).forEach(moveFileConsumer);
     }
 
 }
