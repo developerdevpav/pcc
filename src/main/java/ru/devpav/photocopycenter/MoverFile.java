@@ -13,7 +13,7 @@ public class MoverFile {
 
         if (Files.notExists(destinationFolder)) {
             try {
-                Files.createDirectory(destinationFolder);
+                Files.createDirectories(destinationFolder);
             } catch (IOException ex) {
                 ex.printStackTrace();
             }
@@ -25,7 +25,7 @@ public class MoverFile {
         try (final BufferedInputStream in = new BufferedInputStream(new FileInputStream(file))) {
             Files.copy(in, destinationFile);
         } catch (IOException e) {
-            e.printStackTrace();
+            // e.printStackTrace();
         }
     }
 

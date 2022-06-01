@@ -1,8 +1,19 @@
 package ru.devpav.photocopycenter;
 
+import org.apache.commons.imaging.ImageReadException;
+import org.apache.commons.imaging.Imaging;
+import org.apache.commons.imaging.common.ImageMetadata;
+import org.apache.commons.imaging.formats.jpeg.JpegImageMetadata;
+import org.apache.commons.imaging.formats.tiff.TiffField;
+import org.apache.commons.imaging.formats.tiff.constants.ExifTagConstants;
+import org.apache.commons.imaging.formats.tiff.constants.GpsTagConstants;
+import org.apache.commons.imaging.formats.tiff.constants.TiffTagConstants;
+import org.apache.commons.imaging.formats.tiff.taginfos.TagInfo;
 import org.apache.commons.io.FilenameUtils;
 
+
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Path;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
@@ -24,25 +35,37 @@ public class Application {
 
         initerFileSystem.init();
 
+        final CounterFile counterFile = new CounterFile(fileCopyConfig.getExts());
+
         final Predicate<Path> containsExtensions = (path) -> {
             final String nameFile = path.toAbsolutePath().toString();
             final String extensionFile = FilenameUtils.getExtension(nameFile);
             return fileCopyConfig.getExts().contains(extensionFile.toLowerCase());
         };
 
-        final FileNameBuilder creationTimeNameBuilder = new CreatinTimeNameBuilder();
+        final FileNameBuilder creationTimeNameBuilder = new CreationTimeNameBuilder();
 
         final MoverFile moverFile = new MoverFile();
 
         final Consumer<File> moveFileConsumer = file -> {
             final String creationTimeName = creationTimeNameBuilder.buildName(file.toPath());
-            final Path destinationFolder = fileCopyConfig.getTo().resolve(creationTimeName);
-            
+
+            final Path rootFolder = fileCopyConfig.getTo().resolve(creationTimeName.substring(0, 4));
+            final Path destinationFolder = rootFolder.resolve(creationTimeName.substring(5).trim());
+
             moverFile.move(file, destinationFolder);
         };
 
         final WalkerFileSystem walkerFileSystem = new WalkerFileSystem(fileCopyConfig);
-        walkerFileSystem.getTargetFiles(containsExtensions).forEach(moveFileConsumer);
+        walkerFileSystem.getTargetFiles(containsExtensions)
+                .peek(file -> {
+                    String extension = FilenameUtils.getExtension(file.getName());
+                    counterFile.changeCounter(extension);
+                })
+                .forEach(moveFileConsumer);
+
+        System.out.println(counterFile.getStringResultCounter());
+        counterFile.defaultCounter();
     }
 
 }
