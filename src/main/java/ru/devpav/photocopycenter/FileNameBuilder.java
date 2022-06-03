@@ -4,6 +4,6 @@ import java.nio.file.Path;
 
 public interface FileNameBuilder {
     
-    public String buildName(Path path);
+    String buildName(Path path);
 
 }

@@ -50,8 +50,12 @@ public class Application {
         final Consumer<File> moveFileConsumer = file -> {
             final String creationTimeName = creationTimeNameBuilder.buildName(file.toPath());
 
-            final Path rootFolder = fileCopyConfig.getTo().resolve(creationTimeName.substring(0, 4));
-            final Path destinationFolder = rootFolder.resolve(creationTimeName.substring(5).trim());
+            final String year = creationTimeName.substring(0, 4);
+            final String month = creationTimeName.substring(8);
+            final String day = creationTimeName.substring(4, 7).trim();
+
+            final Path rootFolder = fileCopyConfig.getTo().resolve(year);
+            final Path destinationFolder = rootFolder.resolve(month).resolve(day);
 
             moverFile.move(file, destinationFolder);
         };
@@ -64,7 +68,7 @@ public class Application {
                 })
                 .forEach(moveFileConsumer);
 
-        System.out.println(counterFile.getStringResultCounter());
+        counterFile.getStringResultCounter();
         counterFile.defaultCounter();
     }
 

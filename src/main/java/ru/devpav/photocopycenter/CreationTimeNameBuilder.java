@@ -41,7 +41,7 @@ public class CreationTimeNameBuilder implements FileNameBuilder {
 
     private String getFolderName(String date) {
         final DateFormat df = new SimpleDateFormat("yyyy:MM:dd hh:mm:ss");
-        final SimpleDateFormat format = new SimpleDateFormat("yyyy dd MMMM");
+        final SimpleDateFormat format = new SimpleDateFormat("yyyy dd MM");
 
         try {
             final String substring = date.substring(1, date.length() - 1);

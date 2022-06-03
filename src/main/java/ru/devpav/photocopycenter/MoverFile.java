@@ -22,10 +22,9 @@ public class MoverFile {
         final String fileName = file.getName();
         final Path destinationFile = destinationFolder.resolve(fileName);
 
-        try (final BufferedInputStream in = new BufferedInputStream(new FileInputStream(file))) {
+        try (final BufferedInputStream in = new BufferedInputStream(Files.newInputStream(file.toPath()))) {
             Files.copy(in, destinationFile);
-        } catch (IOException e) {
-            // e.printStackTrace();
+        } catch (IOException ignored) {
         }
     }
 
